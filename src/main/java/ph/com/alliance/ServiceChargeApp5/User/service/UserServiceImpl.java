@@ -1,97 +1,80 @@
 package ph.com.alliance.ServiceChargeApp5.User.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 
-import com.google.gson.Gson;
-
+import ph.com.alliance.ServiceChargeApp5.Role.entity.Role;
+import ph.com.alliance.ServiceChargeApp5.Role.repository.RoleRepository;
 import ph.com.alliance.ServiceChargeApp5.User.entity.User;
 import ph.com.alliance.ServiceChargeApp5.User.repository.UserRepository;
 
 @Service
-public class UserServiceImpl implements UserService
-{
-	/**
-	 * Repository
-	 */
+public class UserServiceImpl implements UserService {
 	private UserRepository userRepository;
-	
-	/**
-	 * Used to convert object to JSON or vice-versa
-	 */
-	private Gson gson;
-	
-	/**
-	 * Autowired Constructor of the User Service class
-	 * @param userRepository - User Repository to be injected
-	 */
+	private RoleRepository roleRepository;
+
 	@Autowired
-	public UserServiceImpl(final UserRepository userRepository)
-	{
+	public UserServiceImpl(final UserRepository userRepository, RoleRepository roleRepository) {
 		this.userRepository = userRepository;
-		gson = new Gson();
+		this.roleRepository = roleRepository;
 	}
 
-	/**
-	 * Gets the user via ID and checks if retrieval is a success or not
-	 * @param id used to determine which account to retrieve in the repository
-	 * @return String which contains the message if retrieval is a success or not
-	 */
-	public String getUserID(final int id) {
-		final Optional<User> user = userRepository.findById(id);
-		
+	public User getUserById(int id) {
+		Optional<User> user = userRepository.findById(id);
+		return user.orElse(null);
+	}
+
+	public User insertUser(User userDetails) {
+//	    return userRepository.saveAndFlush(user);
+		Role role = roleRepository.findById(userDetails.getRole().getRole_id())
+				.orElseThrow(() -> new RuntimeException("Role not found"));
+
+		// Map UserDTO to User entity
+		User user = new User();
+		user.setUsername(userDetails.getUsername());
+		user.setEmail(userDetails.getEmail());
+		user.setPassword(userDetails.getPassword());
+		user.setStatus(userDetails.getStatus());
+		user.setRole(role);
+
+		// Save the User entity to the database
+		return userRepository.saveAndFlush(user);
+
+	}
+
+	public List<User> getAllUsers() {
+		List<User> userList = userRepository.findAll();
+		return userList != null ? userList : Collections.emptyList();
+	}
+
+	public User loginUser(String username, String password) {
+		return userRepository.findByUsernameAndPassword(username, password);
+	}
+
+	public User updateUser(int id, User user) {
+		Optional<User> existingUser = userRepository.findById(id);
+		if (existingUser.isPresent()) {
+			user.setUser_id(id); // set the user id to the specified id
+			User result = userRepository.saveAndFlush(user);
+			return result;
+		} else {
+			return null;
+
+		}
+	}
+
+	public User deleteUser(int id) {
+		Optional<User> user = userRepository.findById(id);
 		if (user.isPresent()) {
-			return gson.toJson(user.get());
+			userRepository.deleteById(id);
+			return user.get();
 		} else {
 			return null;
 		}
 	}
-	
-	/**
-	 * Inserts the user into the database
-	 * @param user to be inserted
-	 * @return String which contains the message if insertion is a success or not
-	 */
-	public String insertUser(final User user)
-	{
-		final User result = userRepository.saveAndFlush(user);
-		return "success";
-	}
-	
-	/**
-	 * Gets all the users in the database
-	 * @return String which contains the JSON-ified objects
-	 */
-	public String getAllUsers()
-	{
-		final List<User> userList = userRepository.findAll();
-		return gson.toJson(userList);
-	}
 
-	public User loginUser(String username, String password) {
-        User user = userRepository.findByUsernameAndPassword(username, password);
-        if (user != null) {
-            return user;
-        } else {
-            return null;
-        }
-    }
-//	 public User loginUser(String username, String password) {
-//	        User user = userRepository.findByUsernameAndPassword(username, password);
-//	        if (user == null) {
-//	            throw new RuntimeException("Invalid username or password");
-//	        }
-//	        return user;
-//	    }
-//	 public String loginUser(String userEmail, String userPassword) {
-//	        User user = userRepository.findByUsernameAndPassword(userEmail, userPassword);
-//	        if (user == null) {
-//	            throw new RuntimeException("Invalid username or password");
-//	        }
-//	        return gson.toJson(user);
-//	    }
 }

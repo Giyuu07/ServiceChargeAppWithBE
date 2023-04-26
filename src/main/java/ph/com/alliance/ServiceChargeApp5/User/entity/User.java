@@ -20,6 +20,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -50,8 +51,9 @@ public class User {
     private String username;
 
     @Column(name="password", nullable = false)
-    @Getter
     @Setter
+    @JsonIgnore
+    @Getter
     private String password;
     
     @Column(name="email", nullable = false)

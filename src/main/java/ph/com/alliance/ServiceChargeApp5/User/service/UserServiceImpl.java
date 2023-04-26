@@ -27,9 +27,13 @@ public class UserServiceImpl implements UserService {
 		Optional<User> user = userRepository.findById(id);
 		return user.orElse(null);
 	}
+	
+	public User getUserByEmail(String email) {
+		Optional<User> user = userRepository.findByEmail(email);
+		return user.orElse(null);
+	}
 
 	public User insertUser(User userDetails) {
-//	    return userRepository.saveAndFlush(user);
 		Role role = roleRepository.findById(userDetails.getRole().getRole_id())
 				.orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -52,7 +56,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	public User loginUser(String username, String password) {
-		return userRepository.findByUsernameAndPassword(username, password);
+		return userRepository.findByEmailAndPassword(username, password);
 	}
 
 	public User updateUser(int id, User user) {
@@ -76,5 +80,21 @@ public class UserServiceImpl implements UserService {
 			return null;
 		}
 	}
+	
+	public String updatePassword(String email, String newPassword) {
+		Optional<User> existingUser = userRepository.findByEmail(email);
+		if (existingUser.isPresent()) {
+			User user = existingUser.get();
+
+			user.setPassword(newPassword);; // set the user id to the specified id
+			userRepository.saveAndFlush(user);
+			return "Change Password Success";
+		} else {
+			return null;
+
+		}
+	}
+
+	
 
 }

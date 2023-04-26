@@ -12,6 +12,10 @@ public interface UserService {
 	User getUserById(final int id);
 	User loginUser(String userEmail, String userPassword);
 	
+	User getUserByEmail(final String email);
+	
+	String updatePassword(final String email, final String newPassword);
+	
 //	User Management
 //	List	
 	List<User> getAllUsers();

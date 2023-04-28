@@ -18,7 +18,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -64,29 +63,26 @@ public class Ticket {
 	@Getter
 	@Setter
 	private LocalDateTime date_closed;
-	
+
 	@Column(name = "last_updated")
 	@Getter
 	@Setter
 	private LocalDateTime last_updated;
 
-	@ManyToOne
-	@JoinColumn(name = "ticket_owner_id", nullable = false, referencedColumnName = "user_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "ticket_owner_id")
 	@Getter
 	@Setter
 	private User ticket_owner_id;
 
-	@ManyToOne
-	@JoinColumn(name = "ticket_assignee_id", referencedColumnName = "user_id")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "ticket_assignee_id")
 	@Getter
 	@Setter
 	private User ticket_assignee_id;
-	
+
+
 	@OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Attachment> attachments = new ArrayList<>();
-
-
-
 
 }

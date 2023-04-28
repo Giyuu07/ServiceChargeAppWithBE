@@ -13,14 +13,11 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -52,7 +49,6 @@ public class User {
 
     @Column(name="password", nullable = false)
     @Setter
-    @JsonIgnore
     @Getter
     private String password;
     
@@ -71,38 +67,18 @@ public class User {
     @Setter
     private LocalDateTime dateCreated;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false, referencedColumnName = "role_id")
     @Getter
     @Setter
     private Role role;
     
-    @OneToMany(mappedBy = "ticket_owner_id", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> ownedTickets = new ArrayList<>();
+    @OneToMany(mappedBy = "ticket_owner_id")
+    private List<Ticket> ownedTickets;
     
-    @OneToMany(mappedBy = "ticket_assignee_id", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> assignedTickets = new ArrayList<>();
-    
-    //Tickets management
-    public void addOwnedTicket(Ticket ticket) {
-        ownedTickets.add(ticket);
-        ticket.setTicket_owner_id(this);
-    }
-    
-    public void removeOwnedTicket(Ticket ticket) {
-        ownedTickets.remove(ticket);
-        ticket.setTicket_owner_id(null);
-    }
-    
-    public void addAssignedTicket(Ticket ticket) {
-        assignedTickets.add(ticket);
-        ticket.setTicket_assignee_id(this);
-    }
-    
-    public void removeAssignedTicket(Ticket ticket) {
-        assignedTickets.remove(ticket);
-        ticket.setTicket_assignee_id(null);
-    }
+    @OneToMany(mappedBy = "ticket_assignee_id")
+    private List<Ticket> assignedTickets;
+   
     
     @PrePersist
     public void prePersist() {

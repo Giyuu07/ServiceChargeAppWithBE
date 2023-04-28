@@ -7,6 +7,7 @@ import ph.com.alliance.ServiceChargeApp5.User.entity.PasswordResetToken;
 
 @Service
 public interface PasswordResetTokenService {
-	PasswordResetToken createPasswordResetToken(String email);
-	PasswordResetToken checkTokenExist(String token);
+	PasswordResetToken createPasswordResetToken(final String email);
+	PasswordResetToken checkTokenExist(final String token);
+	String deleteTokensByEmail(final String email);
 }

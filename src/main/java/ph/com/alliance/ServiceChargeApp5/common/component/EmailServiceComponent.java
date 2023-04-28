@@ -25,17 +25,6 @@ public class EmailServiceComponent
 		this.emailSender = emailSender;
 	}
 	
-//	public String sendSimpleMessage()
-//	{
-//		final SimpleMailMessage message = new SimpleMailMessage();
-//        message.setFrom("servicecharge@noreply.com");
-//        message.setTo("adrianson250@gmail.com"); 
-//        message.setSubject("test"); 
-//        message.setText("test");
-//        emailSender.send(message);
-//        
-//        return "Success!";
-//	}
 	public String sendResetPasswordMessage(String recipientEmail, String resetToken) {
 	    final String emailFrom = "servicecharge@noreply.com";
 	    final String emailSubject = "Password Reset Request";

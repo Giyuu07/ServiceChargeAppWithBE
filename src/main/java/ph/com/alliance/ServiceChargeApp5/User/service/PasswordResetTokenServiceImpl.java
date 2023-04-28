@@ -21,7 +21,7 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService{
 		this.passwordResetTokenRepository = passwordResetTokenRepository;
 	}
 
-	public PasswordResetToken createPasswordResetToken(String email) {
+	public PasswordResetToken createPasswordResetToken(final String email) {
 		  // Generate a unique token
         String token = UUID.randomUUID().toString();
         
@@ -36,9 +36,14 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService{
         return passwordResetTokenRepository.saveAndFlush(passwordResetToken);
 	}
 
-	public PasswordResetToken checkTokenExist(String token) {
+	public PasswordResetToken checkTokenExist(final String token) {
 		Optional<PasswordResetToken> tokenDto = passwordResetTokenRepository.findByToken(token);
 		return tokenDto.orElse(null);
+	}
+	
+	public String deleteTokensByEmail(final String email) {
+		passwordResetTokenRepository.deleteByEmail(email);
+		return "Successfully deleted";
 	}
 
 }

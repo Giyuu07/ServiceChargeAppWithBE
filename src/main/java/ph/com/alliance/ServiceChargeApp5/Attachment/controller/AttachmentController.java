@@ -52,44 +52,6 @@ public class AttachmentController {
 		this.ticketRepository = ticketRepository;
 	}
 	
-	@GetMapping("/tickets/{id}/attachments")
-	public ModelAndView execute()
-	{
-		return new ModelAndView(VIEW_PATH);
-	}
-
-	/**
-	 * Process the file and upload it to the UPLOAD_PATH
-	 * 
-	 * @param request used to get the Part object
-	 * @return ApiResponse whether it is successful or not
-	 */
-//	@PostMapping("/sampleupload")
-//	public ApiResponse process(final HttpServletRequest request)
-//	{
-//		try {
-//			final Part part = request.getPart("file");
-//			part.write(UPLOAD_PATH.concat(getFileName(part)));
-//			
-//			return ApiResponse.CreateSuccess(null, "Success!");
-//		} catch(final IOException | ServletException e) {
-//			return ApiResponse.CreateError(null, "Generic message");
-//		}
-//	}
-//	
-//	@PostMapping("/ticket/{id}/attachments")
-//	public ApiResponse uploadAttachment(@PathVariable("id") int ticketId, HttpServletRequest request) {
-//	    try {
-//	        final Part part = request.getPart("file");
-//	        String fileName = getFileName(part);
-//	        String filePath = UPLOAD_PATH + File.separator + fileName;
-//	        part.write(filePath);
-//	        attachmentService.saveAttachment(ticketId, fileName, filePath);
-//	        return ApiResponse.CreateSuccess(null, "Attachment uploaded successfully!");
-//	    } catch(final IOException | ServletException e) {
-//	        return ApiResponse.CreateError(null, "Failed to upload attachment!");
-//	    }
-//	}
 	
 	@GetMapping("/ticket/attachments")
 	public ApiResponse getAttachments() {
@@ -110,10 +72,10 @@ public class AttachmentController {
 			return ApiResponse.CreateSuccess(result, TicketMessages.TICKET_SUCCESSFUL_GETALL);
 		}
 	}
-
+	
 	@PostMapping("/tickets/{id}/attachments")
 	public ApiResponse uploadAttachment(@PathVariable("id") int ticketId,
-	                                     @RequestParam("file") MultipartFile file) {
+	                                     @RequestParam("file") MultipartFile file,  @RequestParam("file_category") String fileCategory) {
 
 	    Ticket ticket = ticketRepository.findById(ticketId)
 	            .orElseThrow();
@@ -126,11 +88,13 @@ public class AttachmentController {
 	        attachment.setFile_name(filename);
 	        attachment.setFile_data(fileData);
 	        attachment.setFile_type(fileType);
+	        attachment.setFile_category(fileCategory); // set the file category
+
 	        attachment.setTicket(ticket);
 
 	        attachmentService.saveAttachment(attachment);
 
-	        Path uploadDir = Paths.get(UPLOAD_PATH + "/" + ticketId + "/" + attachment.getAttachment_id());
+	        Path uploadDir = Paths.get(UPLOAD_PATH + "/" + ticketId + "/" + fileCategory + "/" + attachment.getAttachment_id());
 	        if (!Files.exists(uploadDir)) {
 	            Files.createDirectories(uploadDir);
 	        }
@@ -138,6 +102,8 @@ public class AttachmentController {
 	        try (InputStream inputStream = file.getInputStream()) {
 	            Path filePath = uploadDir.resolve(filename);
 	            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+	            attachment.setFile_url(filePath.toUri().toString());
+	            attachmentService.saveAttachment(attachment);
 	        }
 
 	        return ApiResponse.CreateSuccess(null, "Attachment uploaded successfully");
@@ -145,25 +111,6 @@ public class AttachmentController {
 	        return ApiResponse.CreateError(null, "Failed to upload attachment");
 	    }
 	}
-	
-	/**
-	 * Gets the filename from the Part object
-	 * 
-	 * @param part used to get the header content-disposition
-	 * @return file name
-	 */
-//	private String getFileName(final Part part)
-//	{
-//		final String contentDisposition = part.getHeader("content-disposition");		
-//		// Sample Content Disposition:form-data; name="file"; filename="attendance.png"
-//
-//		if (!contentDisposition.contains("filename=")) {
-//			return null;
-//		}
-//		
-//		final int beginIndex = contentDisposition.indexOf("filename=") + 10;
-//		final int endIndex = contentDisposition.length() - 1;
-//		
-//		return contentDisposition.substring(beginIndex, endIndex);
-//	}
+
+
 }

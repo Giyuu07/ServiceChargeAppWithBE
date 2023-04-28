@@ -151,7 +151,12 @@ public class UserController {
 		}else {
 			return ResponseEntity.ok("Password updated Successfully");
 		}
-	
 	}
+	
+	   @DeleteMapping("/tokens/delete/{email}")
+	    public ResponseEntity<?> deleteTokensByEmail(@PathVariable String email) {
+	        passwordResetTokenService.deleteTokensByEmail(email);
+	        return ResponseEntity.ok().build();
+	    }
 	
 }

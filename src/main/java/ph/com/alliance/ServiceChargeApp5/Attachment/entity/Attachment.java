@@ -26,32 +26,41 @@ import ph.com.alliance.ServiceChargeApp5.Ticket.entity.Ticket;
 @Entity
 public class Attachment {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "attachment_id")
-	@Getter
-	@Setter
-	private int attachment_id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "attachment_id")
+    @Getter
+    @Setter
+    private int attachment_id;
 
-	@Column(name = "file_name")
-	@Getter
-	@Setter
-	private String file_name;
+    @Column(name = "file_name")
+    @Getter
+    @Setter
+    private String file_name;
 
-	@Column(name = "file_type")
-	@Getter
-	@Setter
-	private String file_type;
+    @Column(name = "file_type")
+    @Getter
+    @Setter
+    private String file_type;
+    
+    @Column(name = "file_category")
+    @Getter
+    @Setter
+    private String file_category;
 
-	@Column(name = "file_data", columnDefinition = "BLOB")
-	@Getter
-	@Setter
-	private byte[] file_data;
+    @Column(name = "file_data", columnDefinition = "BLOB")
+    @Getter
+    @Setter
+    private byte[] file_data;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ticket_id")
-	@Getter
-	@Setter
-	private Ticket ticket;
+    @Column(name = "file_url")
+    @Getter
+    @Setter
+    private String file_url;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id")
+    @Getter
+    @Setter
+    private Ticket ticket;
 }

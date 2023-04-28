@@ -74,8 +74,7 @@ public class UserController {
 	}
 
 	@PostMapping("/user/create")
-	public ApiResponse createUser(@Valid @RequestBody User userDetails, @RequestParam String password) {
-	    userDetails.setPassword(password);
+	public ApiResponse createUser(@Valid @RequestBody User userDetails) {
 	    User result = userService.insertUser(userDetails);
 	    if (null == result) {
 	        return ApiResponse.CreateError(null,UserMessages.USER_UNSUCCESSFUL_SAVE);
